@@ -1,4 +1,4 @@
-# Prueba técnica .net **NeoSoft**
+# Prueba técnica .Net CRUD
 ## Herramientas utilizadas
 - **Visual Studio 2022** (Community, Professional o Enterprise)
 - **.NET 8.0 SDK**
