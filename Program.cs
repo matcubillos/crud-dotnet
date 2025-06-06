@@ -1,11 +1,11 @@
-using WebApplication1.Data;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Extensions;
+using WebApplication1.Persistense;
 
-
+DotNetEnv.Env.Load(); // Cargar variables de entorno desde .env
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -16,7 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
-
+builder.Services.AddScoped<DbInitializer>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularOrigin",
@@ -54,19 +54,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await app.InitializeDatabaseAsync();
 }
 
-// no usar en producción, solo para desarrollo o para inicializacion de la base de datos en primera version
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated(); // Crea la BD y tablas si no existen
-}
+await app.InitializeDatabaseAsync();
 
 
 app.UseCors("AllowAngularOrigin");
 
-//descomentar si se quiere usar https redirection, no recomendado para desarrollo, pero si para producción
+////descomentar si se quiere usar https redirection, no recomendado para desarrollo, pero si para producción
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
